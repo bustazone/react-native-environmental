@@ -1,0 +1,109 @@
+import groovy.json.JsonOutput
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+
+def getCurrentFlavor() {
+
+    Gradle gradle = getGradle()
+    String tskReqStr = gradle.getStartParameter().getTaskNames()
+
+    Pattern pattern = Pattern.compile("(generate|install|assemble)([A-Z]\\w+)*(Release|Debug)")
+
+    Matcher matcher = pattern.matcher(tskReqStr)
+
+
+    if (matcher.find()) {
+        if (matcher.group(2) == null) {
+            println "YOU'VE BEEN CALLING WITHOUT SPECIFYING A FLAVOR"
+            return ""
+        } else {
+            return matcher.group(2).toLowerCase()
+        }
+    } else {
+        println "NO MATCH FOUND"
+        return ""
+    }
+}
+
+def getCurrentFlavorAndBuildTypeSuffix() {
+
+    Gradle gradle = getGradle()
+    String tskReqStr = gradle.getStartParameter().getTaskNames()
+
+    Pattern pattern = Pattern.compile("(generate|install|assemble)([A-Z]\\w+)*(Release|Debug)")
+
+    Matcher matcher = pattern.matcher(tskReqStr)
+
+
+    if (matcher.find()) {
+        if (matcher.group(2) == null) {
+            println "YOU'VE BEEN CALLING WITHOUT SPECIFYING A FLAVOR"
+            return ""
+        } else {
+            return matcher.group(2) + matcher.group(3)
+        }
+    } else {
+        println "NO MATCH FOUND"
+        return ""
+    }
+}
+
+def buildEnviromentFiles() {
+    println "Building enviroment variables with flavour ${getCurrentFlavor()}"
+    def rootModulePath = "$projectDir/../../node_modules/react-native-environmental"
+    def jsonEnvFilePath = "$rootModulePath/.env.json"
+
+    // Set JS .env.json
+    String path = "$projectDir/../../.env.${getCurrentFlavor()}"
+    if (!file(path).exists()) {
+        path = "$projectDir/../../.env"
+        if (!file(path).exists()) {
+            throw new Exception("You don't have any .env or .env.${getCurrentFlavor()} file")
+        }
+    }
+
+    def props = new Properties()
+    file(path).withInputStream { props.load(it) }
+
+    def json = JsonOutput.toJson(props)
+    def fileContent = "$json"
+
+    new File(jsonEnvFilePath).write(fileContent)
+
+    // Set Android enviroment vatiables
+    def env = [:]
+    props.each { prop, val ->
+        env.put(prop, val)
+    }
+    project.ext.set("env", env)
+    android {
+        defaultConfig {
+            project.env.each { k, v ->
+                buildConfigField "String", k, "\"$v\""
+            }
+        }
+    }
+}
+
+def buildEnviromentFilesFinalize() {
+    def rootModulePath = "$projectDir/../../node_modules/react-native-environmental"
+    def jsonEnvFilePath = "$rootModulePath/.env.json"
+    println "-----> Recover state after building enviroment variables"
+    def fileContent = "{}"
+    // Commented due to problems with the version for iOS
+    // new File(jsonEnvFilePath).write(fileContent)
+}
+
+// Execute the task 'buildEnviromentFiles' before any compilation task
+ext.initialize = {
+    buildEnviromentFiles()
+    tasks.whenTaskAdded { task ->
+        if (task.name == 'package' + getCurrentFlavorAndBuildTypeSuffix() || task.name == 'install' + getCurrentFlavorAndBuildTypeSuffix()) {
+            task.doLast {
+                buildEnviromentFilesFinalize()
+            }
+        }
+    }
+}
