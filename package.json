@@ -1,6 +1,6 @@
 {
   "name": "react-native-environmental",
-  "version": "0.0.9",
+  "version": "0.0.25",
   "description": "Less intrussive tool to manage many environment variables accross any part in a React Native Project.",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -11,7 +11,7 @@
     "lib",
     "android",
     "ios",
-    ".env.js"
+    "env.ts"
   ],
   "scripts": {
     "test": "jest",
@@ -38,8 +38,6 @@
     "@react-native-community/bob": "^0.9.7",
     "@react-native-community/eslint-config": "^0.0.7",
     "@types/jest": "^25.1.2",
-    "@types/react": "^16.9.19",
-    "@types/react-native": "0.61.10",
     "commitlint": "^8.3.4",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
@@ -47,16 +45,11 @@
     "husky": "^4.0.1",
     "jest": "^25.1.0",
     "prettier": "^1.19.1",
-    "react": "~16.9.0",
-    "react-native": "~0.61.5",
     "typescript": "^3.7.5"
   },
   "peerDependencies": {
-    "react": "*",
-    "react-native": "*"
   },
   "jest": {
-    "preset": "react-native",
     "modulePathIgnorePatterns": [
       "<rootDir>/lib/"
     ]

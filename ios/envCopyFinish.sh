@@ -10,7 +10,5 @@
 echo "--------> Recover initial values"
 cp "${SRCROOT}/${INFOPLIST_FILE}_prebuildenv_backup" "${SRCROOT}/${INFOPLIST_FILE}"
 cp "${SRCROOT}/Config.xcconfig_prebuildenv_backup" "${SRCROOT}/Config.xcconfig"
-# These lines are commented because it just works on release
-# echo "{}" > "${SRCROOT}/../.env.json"
 rm "${SRCROOT}/${INFOPLIST_FILE}_prebuildenv_backup"
 rm "${SRCROOT}/Config.xcconfig_prebuildenv_backup"

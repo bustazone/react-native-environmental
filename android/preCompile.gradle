@@ -53,9 +53,9 @@ def getCurrentFlavorAndBuildTypeSuffix() {
 def buildEnviromentFiles() {
     println "Building enviroment variables with flavour ${getCurrentFlavor()}"
     def rootModulePath = "$projectDir/../../node_modules/react-native-environmental"
-    def jsonEnvFilePath = "$rootModulePath/.env.json"
+    def jsEnvFilePath = "$rootModulePath/env.ts"
 
-    // Set JS .env.json
+    // Set JS .env.ts
     String path = "$projectDir/../../.env.${getCurrentFlavor()}"
     if (!file(path).exists()) {
         path = "$projectDir/../../.env"
@@ -67,10 +67,21 @@ def buildEnviromentFiles() {
     def props = new Properties()
     file(path).withInputStream { props.load(it) }
 
-    def json = JsonOutput.toJson(props)
-    def fileContent = "$json"
+    def first=true
+    def types=""
+    def object=""
+    props.each { prop, val ->
+        if (first) {
+          first=false
+        } else {
+          object="$object,\n"
+        }
+        types="$types$prop:string\n"
+        object="$object$prop:'$val'"
+    }
+    def fileContent = "export type configType = {\n$types}\nconst config: configType = {\n$object}\nexport default config"
 
-    new File(jsonEnvFilePath).write(fileContent)
+    new File(jsEnvFilePath).write(fileContent)
 
     // Set Android enviroment vatiables
     def env = [:]
@@ -88,12 +99,11 @@ def buildEnviromentFiles() {
 }
 
 def buildEnviromentFilesFinalize() {
-    def rootModulePath = "$projectDir/../../node_modules/react-native-environmental"
-    def jsonEnvFilePath = "$rootModulePath/.env.json"
-    println "-----> Recover state after building enviroment variables"
-    def fileContent = "{}"
-    // Commented due to problems with the version for iOS
-    // new File(jsonEnvFilePath).write(fileContent)
+//     def rootModulePath = "$projectDir/../../node_modules/react-native-environmental"
+//     def jsEnvFilePath = "$rootModulePath/env.ts"
+//     println "-----> Recover state after building enviroment variables"
+//     def fileContent = "type configType = {}\nconst config: configType = {}\nexport default config"
+    // new File(jsEnvFilePath).write(fileContent)
 }
 
 // Execute the task 'buildEnviromentFiles' before any compilation task

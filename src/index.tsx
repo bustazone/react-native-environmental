@@ -1,4 +1,3 @@
-import Config from '../.env.json';
+import Config from '../env';
 
-export default Config as object;
-
+export default Config as any;

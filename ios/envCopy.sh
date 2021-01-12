@@ -8,16 +8,27 @@
 
 echo "Building enviroment files for $1 environment"
 
-# Backup the plist and the xcconfig files
-cp "${SRCROOT}/${INFOPLIST_FILE}" "${SRCROOT}/${INFOPLIST_FILE}_prebuildenv_backup"
-cp "${SRCROOT}/Config.xcconfig" "${SRCROOT}/Config.xcconfig_prebuildenv_backup"
+# Restore or Backup the plist and the xcconfig files
+plistfile="${SRCROOT}/${INFOPLIST_FILE}"
+configfile="${SRCROOT}/Config.xcconfig"
+plistfilebackup="${SRCROOT}/${INFOPLIST_FILE}_prebuildenv_backup"
+configfilebackup="${SRCROOT}/Config.xcconfig_prebuildenv_backup"
+if [ -f "${plistfilebackup}" ]; then
+  cp "${plistfilebackup}" "${plistfile}"
+else
+  cp "${plistfile}" "${plistfilebackup}"
+fi
+if [ -f "${configfilebackup}" ]; then
+  cp "${configfilebackup}" "${configfile}"
+else
+  cp "${configfile}" "${configfilebackup}"
+fi
 
+# Extract .env data
 inputmain="${SRCROOT}/../.env"
 inputspecific="$inputmain.$1"
-
 if [ -f "${inputspecific}" ]; then
     echo "Extracting from file ${inputspecific}"
-    echo "${SRCROOT}/../node_modules/react-native-environmental/ios/envCopyAux.sh"
     . "${SRCROOT}/../node_modules/react-native-environmental/ios/envCopyAux.sh" "${inputspecific}"
 else
     if [ -f "${inputmain}" ]; then
