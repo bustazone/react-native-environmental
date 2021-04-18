@@ -1,6 +1,6 @@
 # react-native-environmental
 
-Less intrussive tool to manage many environment variables accross any part in a React Native Project.
+Less intrussive tool to manage many environment variables accross native and javascript code in a React Native Projects.
 
 ## Installation
 
@@ -9,6 +9,7 @@ npm install react-native-environmental
 ```
 
 ## Usage
+(🚧  Under Construction)
 
 add .env's (.env.<whatever>)
 android
